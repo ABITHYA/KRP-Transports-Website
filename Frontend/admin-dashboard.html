@@ -664,7 +664,7 @@ validateJWTToken();
         // Load drivers from backend
         async function loadDrivers() {
             try {
-                const response = await fetch('http://localhost:5000/active-drivers');
+                const response = await fetch(`${API_URL}/active-drivers`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -723,7 +723,7 @@ validateJWTToken();
             try {
                 const attendancePromises = Object.entries(attendanceData).map(([driverId, status]) => {
                     const driver = drivers.find(d => d._id === driverId);
-                    return fetch('http://localhost:5000/attendance', {
+                    return fetch(`${API_URL}/attendance`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -764,7 +764,7 @@ validateJWTToken();
         // Load attendance history from backend
         async function loadAttendanceHistory() {
             try {
-                const response = await fetch('http://localhost:5000/attendance');
+                const response = await fetch(`${API_URL}/attendance`);
                 const result = await response.json();
                 
                 const historyBody = document.getElementById('attendanceHistoryBody');
@@ -821,7 +821,7 @@ validateJWTToken();
         // Load drivers for attendance dropdown
         async function loadDriversForAttendance() {
             try {
-                const response = await fetch('http://localhost:5000/active-drivers');
+                const response = await fetch(`${API_URL}/active-drivers`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -847,7 +847,7 @@ validateJWTToken();
                 await loadDrivers();
                 renderEmployeeList();
                 
-                const response = await fetch('http://localhost:5000/attendance');
+                const response = await fetch(`${API_URL}/attendance`);
                 const result = await response.json();
                 
                 const historyBody = document.getElementById('historyTableBody');
@@ -933,7 +933,7 @@ validateJWTToken();
 
             try {
                 // Fetch attendance data for the selected date range
-                const response = await fetch(`http://localhost:5000/attendance?startDate=${startDate}&endDate=${endDate}`);
+                const response = await fetch(`${API_URL}/attendance?startDate=${startDate}&endDate=${endDate}`);
                 const result = await response.json();
 
                 if (!result.success || result.data.length === 0) {
@@ -1058,7 +1058,7 @@ validateJWTToken();
         async function fetchDashboardStats() {
             try {
                 const token = localStorage.getItem('adminToken');
-                const response = await fetch('http://localhost:5000/dashboard-stats', {
+                const response = await fetch(`${API_URL}/dashboard-stats`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1096,7 +1096,7 @@ validateJWTToken();
         // Fetch all drivers
         async function fetchDrivers() {
             try {
-                const response = await fetch('http://localhost:5000/drivers');
+                const response = await fetch(`${API_URL}/drivers`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -1152,7 +1152,7 @@ validateJWTToken();
         // Open Edit Driver Modal
         async function editDriver(driverId) {
             try {
-                const response = await fetch(`http://localhost:5000/drivers`);
+                const response = await fetch(`${API_URL}/drivers`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -1191,7 +1191,7 @@ validateJWTToken();
             }
 
             try {
-                const url = driverId ? `http://localhost:5000/drivers/${driverId}` : 'http://localhost:5000/drivers';
+                const url = driverId ? `${API_URL}/drivers/${driverId}` : `${API_URL}/drivers`;
                 const method = driverId ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -1239,7 +1239,7 @@ validateJWTToken();
             if (!driverToDelete) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/drivers/${driverToDelete}`, {
+                const response = await fetch(`${API_URL}/drivers/${driverToDelete}`, {
                     method: 'DELETE'
                 });
 
@@ -1374,7 +1374,7 @@ validateJWTToken();
             }
             
             try {
-                const response = await fetch('http://localhost:5000/license-renewals');
+                const response = await fetch(`${API_URL}/license-renewals`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1425,10 +1425,10 @@ validateJWTToken();
                     <td>
                         ${renewal.licenseFile ? 
                             `<div class="file-actions">
-                                <a href="http://localhost:5000/uploads/${renewal.licenseFile}" class="file-link" target="_blank">
+                                <a href="${API_URL}/uploads/${renewal.licenseFile}" class="file-link" target="_blank">
                                     <i class="fas fa-eye"></i> View
                                 </a>
-                                <a href="http://localhost:5000/uploads/${renewal.licenseFile}" class="file-link download-link" download>
+                                <a href="${API_URL}/uploads/${renewal.licenseFile}" class="file-link download-link" download>
                                     <i class="fas fa-download"></i> Download
                                 </a>
                             </div>` : 
@@ -1461,7 +1461,7 @@ validateJWTToken();
             }
             
             try {
-                const response = await fetch('http://localhost:5000/rc-renewals');
+                const response = await fetch(`${API_URL}/rc-renewals`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1512,10 +1512,10 @@ validateJWTToken();
                     <td>
                         ${renewal.rcFile ? 
                             `<div class="file-actions">
-                                <a href="http://localhost:5000/uploads/${renewal.rcFile}" class="file-link" target="_blank">
+                                <a href="${API_URL}/uploads/${renewal.rcFile}" class="file-link" target="_blank">
                                     <i class="fas fa-eye"></i> View
                                 </a>
-                                <a href="http://localhost:5000/uploads/${renewal.rcFile}" class="file-link download-link" download>
+                                <a href="${API_URL}/uploads/${renewal.rcFile}" class="file-link download-link" download>
                                     <i class="fas fa-download"></i> Download
                                 </a>
                             </div>` : 
@@ -1540,7 +1540,7 @@ validateJWTToken();
         // Load drivers for license modal
         async function loadDriversForLicenseModal() {
             try {
-                const response = await fetch('http://localhost:5000/drivers');
+                const response = await fetch(`${API_URL}/drivers`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -1604,7 +1604,7 @@ validateJWTToken();
 
             try {
                 // Get driver name
-                const driverResponse = await fetch('http://localhost:5000/drivers');
+                const driverResponse = await fetch(`${API_URL}/drivers`);
                 const driverResult = await driverResponse.json();
                 const driver = driverResult.data.find(d => d._id === driverId);
                 const driverName = driver ? driver.name : '';
@@ -1622,7 +1622,7 @@ validateJWTToken();
                     formData.append('licenseFile', licenseFileInput.files[0]);
                 }
 
-                const url = licenseId ? `http://localhost:5000/license-renewals/${licenseId}` : 'http://localhost:5000/license-renewals';
+                const url = licenseId ? `${API_URL}/license-renewals/${licenseId}` : `${API_URL}/license-renewals`;
                 const method = licenseId ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -1648,7 +1648,7 @@ validateJWTToken();
         // Edit License Renewal
         async function editLicenseRenewal(licenseId) {
             try {
-                const response = await fetch('http://localhost:5000/license-renewals');
+                const response = await fetch(`${API_URL}/license-renewals`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -1685,7 +1685,7 @@ validateJWTToken();
             if (!licenseToDelete) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/license-renewals/${licenseToDelete}`, {
+                const response = await fetch(`${API_URL}/license-renewals/${licenseToDelete}`, {
                     method: 'DELETE'
                 });
 
@@ -1758,7 +1758,7 @@ validateJWTToken();
                     formData.append('rcFile', rcFileInput.files[0]);
                 }
 
-                const url = rcId ? `http://localhost:5000/rc-renewals/${rcId}` : 'http://localhost:5000/rc-renewals';
+                const url = rcId ? `${API_URL}/rc-renewals/${rcId}` : `${API_URL}/rc-renewals`;
                 const method = rcId ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -1784,7 +1784,7 @@ validateJWTToken();
         // Edit RC Renewal
         async function editRCRenewal(rcId) {
             try {
-                const response = await fetch('http://localhost:5000/rc-renewals');
+                const response = await fetch(`${API_URL}/rc-renewals`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -1816,7 +1816,7 @@ validateJWTToken();
             if (!rcToDelete) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/rc-renewals/${rcToDelete}`, {
+                const response = await fetch(`${API_URL}/rc-renewals/${rcToDelete}`, {
                     method: 'DELETE'
                 });
 
@@ -1861,7 +1861,11 @@ validateJWTToken();
         async function fetchMessages() {
     console.log("Fetching messages from backend...");
     try {
-        const response = await fetch("http://localhost:5000/messages");
+        const response = await fetch(`${API_URL}/messages`, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
         console.log("Response status:", response.status);
         
         const result = await response.json();
@@ -1972,7 +1976,7 @@ validateJWTToken();
             
             try {
                 // FIX 4 — ENSURE CORRECT FETCH
-                const response = await fetch(`http://localhost:5000/messages/${messageId}/read`, {
+                const response = await fetch(`${API_URL}/messages/${messageId}/read`, {
                     method: "PUT"
                 });
                 
@@ -2077,7 +2081,7 @@ validateJWTToken();
         // Mark message as read
         async function markAsRead(messageId) {
             try {
-                const response = await fetch(`http://localhost:5000/messages/${messageId}/read`, {
+                const response = await fetch(`${API_URL}/messages/${messageId}/read`, {
                     method: 'PUT'
                 });
                 
