@@ -1698,7 +1698,7 @@
               verifyBtn.disabled = false;
               
               if (data.success) {
-                otpMessage.textContent = "OTP verified ✅";
+                otpMessage.textContent = "OTP verified ";
                 otpMessage.classList.add('success', 'show');
                 
                 // Clear countdown
@@ -1714,7 +1714,7 @@
                     }, 300);
                 }, 1000);
               } else {
-                otpMessage.textContent = "Invalid OTP ❌";
+                otpMessage.textContent = "Invalid OTP ";
                 otpMessage.classList.add('error', 'show');
                 
                 // Clear OTP inputs on error
@@ -1757,7 +1757,7 @@
             .then(res => res.json())
             .then(data => {
               if (data.success) {
-                countdownText.textContent = "OTP sent successfully ✅";
+                countdownText.textContent = "OTP sent successfully ";
                 resendBtn.innerHTML = 'Resend OTP';
                 
                 // Start countdown after successful send
