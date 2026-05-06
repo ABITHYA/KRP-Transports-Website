@@ -1305,7 +1305,6 @@
 
     <script src="api-config.js"></script>
     <script>
-        const API_URL = import.meta.env.VITE_API_URL;
 
         // Simple Password Toggle Functions
         function togglePassword() {
@@ -1482,7 +1481,7 @@
                     emailInput.style.borderColor = "#2563eb"; // Blue border while checking
 
                     try {
-                        const res = await fetch("http://localhost:5000/check-email", {
+                        const res = await fetch(`${API_URL}/check-email`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"
@@ -1527,7 +1526,7 @@
             // Clear previous message
             mobileMessage.classList.remove('show', 'error', 'success', 'info');
 
-            fetch("http://localhost:5000/forgot-password-email",  {
+            fetch(`${API_URL}/forgot-password-email`,  {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -1682,7 +1681,7 @@
             verifyBtn.classList.add('loading');
             verifyBtn.disabled = true;
 
-            fetch("http://localhost:5000/verify-otp", {
+            fetch(`${API_URL}/verify-otp`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -1746,7 +1745,7 @@
             resendBtn.disabled = true;
             resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             
-            fetch("http://localhost:5000/forgot-password-email", {
+            fetch(`${API_URL}/forgot-password-email`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -1914,7 +1913,7 @@
             
             const email = localStorage.getItem("resetEmail");
 
-            fetch("http://localhost:5000/reset-password", {
+            fetch(`${API_URL}/reset-password`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
