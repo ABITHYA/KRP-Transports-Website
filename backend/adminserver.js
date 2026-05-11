@@ -116,12 +116,26 @@ const RCRenewal = mongoose.model("RCRenewal", rcRenewalSchema);
 
 require("dotenv").config({ path: "./server.env" });
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+  },
+  debug: true,
+  logger: true
+});
+
+// Test transporter immediately
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log("EMAIL TRANSPORTER ERROR:", error);
+  } else {
+    console.log("EMAIL TRANSPORTER READY - Server is ready to send messages");
   }
 });
+
 
 
 
@@ -166,6 +180,42 @@ app.get("/", (req, res) => {
 
   res.send("KRP Backend Running Successfully ");
 
+});
+
+// Test Email Route
+app.get("/test-email", async (req, res) => {
+  try {
+    const testEmail = req.query.email || process.env.EMAIL_USER;
+    
+    console.log("TESTING EMAIL TO:", testEmail);
+    console.log("EMAIL USER:", process.env.EMAIL_USER);
+    console.log("EMAIL PASS LENGTH:", process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 'undefined');
+    
+    const testMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: testEmail,
+      subject: "KRP Transport - Test Email",
+      text: "This is a test email from KRP Transport system.",
+      html: "<h2>Test Email</h2><p>This is a test email from KRP Transport system.</p>"
+    };
+
+    const info = await transporter.sendMail(testMailOptions);
+    
+    console.log("TEST EMAIL SENT:", info);
+    
+    res.json({
+      success: true,
+      message: "Test email sent successfully",
+      messageId: info.messageId
+    });
+
+  } catch (error) {
+    console.log("TEST EMAIL ERROR:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 
@@ -1157,31 +1207,46 @@ app.post("/forgot-password-email", async (req, res) => {
   try {
     const { email } = req.body;
 
-    const admin = await Admin.findOne({ email: email });
+    console.log("========== FORGOT PASSWORD REQUEST START ==========");
+    console.log("EMAIL:", email);
 
-    if (!admin) {
-      return res.json({
+    if (!email) {
+      return res.status(400).json({
         success: false,
-        message: "Email not found"
+        message: "Email required"
       });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    // Skip database check for now - send OTP directly
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    console.log("OTP GENERATED:", otp);
 
     otpStore[email] = otp;
+    console.log("OTP STORED for email:", email);
 
+    // Send email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset OTP",
-      text: `Your OTP is: ${otp}`
+      text: `Your OTP is: ${otp}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #b30000;">KRP Transport - Password Reset</h2>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+            <h1 style="color: #053047; font-size: 32px; margin: 0;">${otp}</h1>
+          </div>
+          <p style="color: #666;">Your OTP expires in 5 minutes.</p>
+        </div>
+      `
     });
 
-    console.log("Email OTP:", otp);
+    console.log("MAIL SENT SUCCESSFULLY!");
 
     res.json({
       success: true,
-      message: "OTP sent to email"
+      message: "OTP sent successfully"
     });
 
   } catch (error) {
@@ -1234,14 +1299,25 @@ const otpLimiter = rateLimit({
   }
 });
 app.post("/verify-otp", otpLimiter, (req, res) => {
+  console.log("========== OTP VERIFICATION START ==========");
   const { email, otp } = req.body;
 
+  console.log("RECEIVED EMAIL:", email);
+  console.log("RECEIVED OTP:", otp);
+  console.log("STORED OTP:", otpStore[email]);
+  console.log("OTP TYPE:", typeof otp);
+  console.log("STORED OTP TYPE:", typeof otpStore[email]);
+  console.log("COMPARISON:", otpStore[email] == otp);
+  console.log("STRICT COMPARISON:", otpStore[email] === otp);
+
   if (otpStore[email] == otp) {
+    console.log("OTP VERIFICATION SUCCESS");
     res.json({
       success: true,
       message: "OTP verified"
     });
   } else {
+    console.log("OTP VERIFICATION FAILED");
     res.json({
       success: false,
       message: "Invalid OTP"
