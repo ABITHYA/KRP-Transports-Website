@@ -1513,39 +1513,70 @@
         });
 
         // Form submission handlers
-        document.getElementById('mobileForm').addEventListener('submit', async function(e) {
+        console.log("SETTING UP FORM EVENT LISTENER");
+        const mobileForm = document.getElementById('mobileForm');
+        console.log("FORM ELEMENT FOUND:", mobileForm);
+        
+        if (mobileForm) {
+            mobileForm.addEventListener('submit', async function(e) {
+            console.log("=== FORM SUBMISSION STARTED ===");
+            console.log("EVENT TYPE:", e.type);
             e.preventDefault();
             
-            const response = await fetch("https://krp-transports-website.onrender.com/forgot-password-email", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: document.getElementById('mobileNumber').value.trim()
-                })
-            });
+            const email = document.getElementById('mobileNumber').value.trim();
+            console.log("EMAIL ENTERED:", email);
+            console.log("API_URL:", API_URL);
+            console.log("FULL URL:", `${API_URL}/forgot-password-email`);
+            
+            // Show loading state
+            document.getElementById("mobileMessage").className = "form-message info show";
+            document.getElementById("mobileMessage").innerText = "Sending OTP...";
+            
+            try {
+                console.log("SENDING REQUEST...");
+                const response = await fetch(`${API_URL}/forgot-password-email`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                });
 
-            const data = await response.json();
+                console.log("RESPONSE STATUS:", response.status);
+                console.log("RESPONSE OK:", response.ok);
 
-            console.log(data);
+                const data = await response.json();
+                console.log("RESPONSE DATA:", data);
 
-            if (data.success) {
+                if (data.success) {
 
-                localStorage.setItem(
-                    "resetEmail",
-                    document.getElementById('mobileNumber').value.trim()
-                );
+                    localStorage.setItem(
+                        "resetEmail",
+                        document.getElementById('mobileNumber').value.trim()
+                    );
 
-                document.getElementById("mobileSection").classList.remove("active");
+                    document.getElementById("mobileSection").classList.remove("active");
+                    document.getElementById("otpSection").classList.add("active");
 
-                document.getElementById("otpSection").classList.add("active");
+                    // Start countdown timer
+                    startCountdown();
 
-            } else {
+                } else {
 
-                document.getElementById("mobileMessage").innerText = data.message;
+                    document.getElementById("mobileMessage").innerText = data.message;
+                }
+
+            } catch (error) {
+                console.log("FETCH ERROR:", error);
+                document.getElementById("mobileMessage").className = "form-message error show";
+                document.getElementById("mobileMessage").innerText = "Server error sending OTP";
             }
-        });
+            });
+        } else {
+            console.log("ERROR: mobileForm element not found!");
+        }
 
         // OTP Countdown Timer Variables
         let countdownInterval;
@@ -1553,17 +1584,24 @@
 
         // Start Countdown Timer
         function startCountdown() {
+            console.log("STARTING COUNTDOWN TIMER");
             const resendBtn = document.getElementById('resendOtpBtn');
             const countdownText = document.getElementById('countdownText');
+            
+            console.log("COUNTDOWN ELEMENTS FOUND:", resendBtn, countdownText);
             
             resendBtn.disabled = true;
             countdownTime = 30;
             
+            console.log("INITIAL COUNTDOWN TIME:", countdownTime);
+            
             countdownInterval = setInterval(() => {
+                console.log("COUNTDOWN TICK:", countdownTime);
                 if (countdownTime > 0) {
                     countdownText.textContent = `Resend OTP in ${countdownTime}s`;
                     countdownTime--;
                 } else {
+                    console.log("COUNTDOWN FINISHED");
                     clearInterval(countdownInterval);
                     countdownText.textContent = '';
                     resendBtn.disabled = false;
@@ -1664,7 +1702,10 @@
             verifyBtn.classList.add('loading');
             verifyBtn.disabled = true;
 
-            fetch("https://krp-transports-website.onrender.com/verify-otp", {
+            console.log("VERIFYING OTP - Email:", mobileNumber, "OTP:", otp);
+            console.log("API_URL:", API_URL);
+            
+            fetch(`${API_URL}/verify-otp`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -1674,8 +1715,13 @@
                 otp: otp
               })
             })
-            .then(res => res.json())
+            .then(res => {
+                console.log("OTP VERIFY RESPONSE STATUS:", res.status);
+                return res.json();
+            })
             .then(data => {
+              console.log("OTP VERIFY RESPONSE DATA:", data);
+              
               // Hide loading state
               verifyBtn.classList.remove('loading');
               verifyBtn.disabled = false;
@@ -2017,6 +2063,7 @@
             loginSection.style.display = 'block';
         }
     </script>
+    <script src="api-config.js"></script>
 
     </body>
 </html>
